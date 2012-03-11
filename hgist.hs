@@ -33,7 +33,7 @@ parseFiles (Object v) = mapM parseJSON (H.elems v)
 parseFiles _ = empty
 
 showGist :: Gist -> String
-showGist g = "* " ++ fromMaybe "(No description)" (description g) ++ "\n" ++ showFiles (files g)
+showGist g = gistId g ++ ": " ++ fromMaybe "(No description)" (description g) ++ "\n" ++ showFiles (files g)
     where 
         showFiles files = "    " ++ intercalate ", " (map filename files)
 
