@@ -11,12 +11,18 @@ import Network.HTTP.Conduit
 import qualified Data.HashMap.Strict as H
 import qualified Data.ByteString.Lazy.Char8 as BL 
 
-data Gist = Gist {description :: Maybe String, files :: [File]} deriving (Show, Eq)
+data Gist = Gist {gistId :: String, 
+                  description :: Maybe String, 
+                  files :: [File]} 
+                  deriving (Show, Eq)
 
 data File = File {filename :: String} deriving (Show, Eq)
 
 instance FromJSON Gist where
-    parseJSON (Object v) = Gist <$> v .:? "description" <*> (v .: "files" >>= parseFiles)
+    parseJSON (Object v) = Gist <$> 
+        v .: "id" <*>
+        v .:? "description" <*> 
+        (v .: "files" >>= parseFiles)
     parseJSON _ = empty
 
 instance FromJSON File where
