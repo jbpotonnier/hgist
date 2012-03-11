@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module HGist where
 
+import System.Environment (getArgs) 
 import Control.Applicative ((<$>), (<*>), empty)
 import Control.Monad (liftM)
 import Data.Aeson
@@ -38,4 +39,6 @@ findGistListForUser username =
     liftM decodeGistList $ simpleHttp ("https://api.github.com/users/" ++ username ++ "/gists")
     
 main :: IO ()
-main = findGistListForUser "jjeeb" >>= mapM_ (putStrLn . showGist)
+main = do
+    [user]<- getArgs
+    findGistListForUser user >>= mapM_ (putStrLn . showGist)
