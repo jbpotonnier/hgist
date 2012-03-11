@@ -2,7 +2,11 @@
 module HGist where
 
 import Control.Applicative ((<$>), (<*>), empty)
+import Control.Monad (liftM)
 import Data.Aeson
+import Data.Maybe (fromMaybe)
+import Data.List (intercalate)
+import Network.HTTP.Conduit
 import qualified Data.HashMap.Strict as H
 import qualified Data.ByteString.Lazy.Char8 as BL 
 
@@ -18,9 +22,20 @@ instance FromJSON File where
     parseJSON (Object v) = File <$> v .: "filename"
     parseJSON _ = empty
 
-
 parseFiles (Object v) = mapM parseJSON (H.elems v)
 parseFiles _ = empty
 
-decodeGistList :: BL.ByteString -> Maybe [Gist] 
-decodeGistList = decode
+showGist :: Gist -> String
+showGist g = "* " ++ description g ++ "\n" ++ showFiles (files g)
+    where 
+        showFiles files = "    " ++ intercalate ", " (map filename files)
+
+decodeGistList :: BL.ByteString -> [Gist] 
+decodeGistList = fromMaybe [] . decode
+
+findGistListForUser :: String -> IO [Gist]
+findGistListForUser username =
+    liftM decodeGistList $ simpleHttp ("https://api.github.com/users/" ++ username ++ "/gists")
+    
+main :: IO ()
+main = findGistListForUser "jjeeb" >>= mapM_ (putStrLn . showGist)
