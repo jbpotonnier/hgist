@@ -20,11 +20,11 @@ instance FromJSON File where
 
 parseFiles (Object v) = mapM parseJSON (H.elems v)
 parseFiles _ = empty
-               
 
-tests = test [ 
-    "(decode gist)" ~: 
-        Just Gist {description = "My description", files = [ File {filename = "myfile.hs"}]} 
+
+tests = test [
+    "(decode gist)" ~:
+        Just Gist {description = "My description", files = [ File {filename = "myfile.hs"}]}
         ~=?
         (decode "{\"description\": \"My description\", \"files\": {\"myfile.hs\": {\"filename\": \"myfile.hs\"} } }" :: Maybe Gist)
     ]
