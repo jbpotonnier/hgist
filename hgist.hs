@@ -8,8 +8,10 @@ import Data.Aeson
 import Data.Maybe (fromMaybe)
 import Data.List (intercalate)
 import Network.HTTP.Conduit
+import Network.HTTP.Types (Method)
 import qualified Data.HashMap.Strict as H
 import qualified Data.ByteString.Lazy.Char8 as BL 
+import qualified Data.ByteString.Char8 as BS
 
 data Gist = Gist {gistId :: String, 
                   description :: Maybe String, 
@@ -43,8 +45,27 @@ decodeGistList = fromMaybe [] . decode
 findGistListForUser :: String -> IO [Gist]
 findGistListForUser username =
     liftM decodeGistList $ simpleHttp ("https://api.github.com/users/" ++ username ++ "/gists")
-    
+
+listGists :: String -> IO()
+listGists user = findGistListForUser user >>= mapM_ (putStrLn . showGist)
+
+--deleteGist :: String -> String -> String -> IO ()
+deleteGist user pass gistId = authRequest "DELETE" user pass ("https://api.github.com/gists/" ++ gistId)
+
+--authRequest :: Method -> String -> String -> String -> IO ()
+authRequest httpMethod user password url = do
+    request <- parseUrl url
+    let postRequest = applyBasicAuth user password $ request { method = httpMethod }
+    withManager $ \manager -> do
+        response <- http postRequest manager
+        return ()
+
+dispatch :: [String] -> IO ()
+dispatch ["ls", user] = listGists user
+dispatch ["rm", user, password, gistId] = deleteGist (BS.pack user) (BS.pack password) gistId
+
 main :: IO ()
 main = do
-    [user]<- getArgs
-    findGistListForUser user >>= mapM_ (putStrLn . showGist)
+    args <- getArgs
+    dispatch args
+
