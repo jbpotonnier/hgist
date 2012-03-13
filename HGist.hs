@@ -49,10 +49,10 @@ findGistListForUser username =
 listGists :: String -> IO()
 listGists user = findGistListForUser user >>= mapM_ (putStrLn . showGist)
 
---deleteGist :: String -> String -> String -> IO ()
+deleteGist :: BS.ByteString -> BS.ByteString -> String -> IO ()
 deleteGist user pass gistId = authRequest "DELETE" user pass ("https://api.github.com/gists/" ++ gistId)
 
---authRequest :: Method -> String -> String -> String -> IO ()
+authRequest :: Method -> BS.ByteString -> BS.ByteString -> String -> IO ()
 authRequest httpMethod user password url = do
     request <- parseUrl url
     let postRequest = applyBasicAuth user password $ request { method = httpMethod }
