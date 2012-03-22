@@ -60,6 +60,10 @@ authRequest httpMethod user password url = do
         response <- http postRequest manager
         return ()
 
+
+encodeGist :: String -> [String] -> BL.ByteString
+encodeGist description files = encode $ object ["description" .= description, "public" .= True]
+
 dispatch :: [String] -> IO ()
 dispatch ["ls", user] = listGists user
 dispatch ["rm", user, password, gistId] = deleteGist (BS.pack user) (BS.pack password) gistId
