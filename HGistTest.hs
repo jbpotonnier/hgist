@@ -27,7 +27,7 @@ tests = test [
       files = [File {filename = "myFile.hs"}, File {filename = "myOtherFile.hs"}]},
     
     "(encodeGist)" ~:
-    "{\"description\":\"my description\",\"public\":true,\"files\":{\"first-file\":{\"content\":\"first content\"}}}" 
+    "{\"files\":{\"first-file\":{\"content\":\"first content\"}},\"description\":\"my description\",\"public\":true}" 
     ~=?
     (BL.unpack $ encodeGist "my description" [("first-file", "first content")])
     ]

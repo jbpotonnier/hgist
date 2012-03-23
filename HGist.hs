@@ -12,6 +12,7 @@ import Network.HTTP.Types (Method)
 import qualified Data.HashMap.Strict as H
 import qualified Data.ByteString.Lazy.Char8 as BL 
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.Text as T
 
 data Gist = Gist {gistId :: String, 
                   description :: Maybe String, 
@@ -64,7 +65,7 @@ authRequest httpMethod user password url = do
 encodeGist :: String -> [(String, BL.ByteString)] -> BL.ByteString
 encodeGist description files = encode $ object ["description" .= description, 
                                                 "public" .= True,
-                                                "files" .= object [ filename .= content | (filename, content) <- files]]
+                                                "files" .= object [T.pack name .= object ["content" .= content] | (name, content) <- files]]
 
 dispatch :: [String] -> IO ()
 dispatch ["ls", user] = listGists user
