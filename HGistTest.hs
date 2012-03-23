@@ -27,9 +27,9 @@ tests = test [
       files = [File {filename = "myFile.hs"}, File {filename = "myOtherFile.hs"}]},
     
     "(encodeGist)" ~:
-    "{\"description\":\"my description\",\"public\":true}" 
+    "{\"description\":\"my description\",\"public\":true,\"files\":{\"first-file\":{\"content\":\"first content\"}}}" 
     ~=?
-    (BL.unpack $ encodeGist "my description" [])
+    (BL.unpack $ encodeGist "my description" [("first-file", "first content")])
     ]
         
 main = runTestTT tests

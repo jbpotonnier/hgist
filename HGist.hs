@@ -61,8 +61,10 @@ authRequest httpMethod user password url = do
         return ()
 
 
-encodeGist :: String -> [String] -> BL.ByteString
-encodeGist description files = encode $ object ["description" .= description, "public" .= True]
+encodeGist :: String -> [(String, BL.ByteString)] -> BL.ByteString
+encodeGist description files = encode $ object ["description" .= description, 
+                                                "public" .= True,
+                                                "files" .= object [ filename .= content | (filename, content) <- files]]
 
 dispatch :: [String] -> IO ()
 dispatch ["ls", user] = listGists user
