@@ -56,9 +56,9 @@ deleteGist user pass gistId = authRequest "DELETE" user pass ("https://api.githu
 authRequest :: Method -> BS.ByteString -> BS.ByteString -> String -> IO ()
 authRequest httpMethod user password url = do
     request <- parseUrl url
-    let postRequest = applyBasicAuth user password $ request { method = httpMethod }
+    let request' = applyBasicAuth user password $ request { method = httpMethod }
     withManager $ \manager -> do
-        response <- http postRequest manager
+        response <- http request' manager
         return ()
 
 
