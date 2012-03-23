@@ -43,12 +43,10 @@ showGist g = gistId g ++ ": " ++ fromMaybe "(No description)" (description g) ++
 decodeGistList :: BL.ByteString -> [Gist] 
 decodeGistList = fromMaybe [] . decode
 
-findGistListForUser :: String -> IO [Gist]
-findGistListForUser username =
-    liftM decodeGistList $ simpleHttp ("https://api.github.com/users/" ++ username ++ "/gists")
-
 listGists :: String -> IO()
 listGists user = findGistListForUser user >>= mapM_ (putStrLn . showGist)
+  where findGistListForUser username = 
+          liftM decodeGistList $ simpleHttp ("https://api.github.com/users/" ++ username ++ "/gists")
 
 deleteGist :: BS.ByteString -> BS.ByteString -> String -> IO ()
 deleteGist user pass gistId = authRequest "DELETE" user pass ("https://api.github.com/gists/" ++ gistId)
