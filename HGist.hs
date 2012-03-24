@@ -63,9 +63,10 @@ gitHubUrl :: [String] -> String
 gitHubUrl = intercalate "/" . (["https://api.github.com"] ++)
 
 encodeGist :: String -> [(String, BL.ByteString)] -> BL.ByteString
-encodeGist description files = encode $ object ["description" .= description, 
-                                                "public" .= True,
-                                                "files" .= object [T.pack name .= object ["content" .= content] | (name, content) <- files]]
+encodeGist description files = 
+  encode $ object ["description" .= description, 
+                   "public" .= True,
+                   "files" .= object [T.pack name .= object ["content" .= content] | (name, content) <- files]]
 
 dispatch :: [String] -> IO ()
 dispatch ["ls", user] = listGists user
