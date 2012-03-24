@@ -31,7 +31,7 @@ instance FromJSON Gist where
 instance FromJSON File where
     parseJSON (Object v) = File <$> v .: "filename"
     parseJSON _ = empty
-
+    
 parseFiles (Object v) = mapM parseJSON (H.elems v)
 parseFiles _ = empty
 
@@ -46,19 +46,21 @@ decodeGistList = fromMaybe [] . decode
 listGists :: String -> IO()
 listGists user = findGistListForUser user >>= mapM_ (putStrLn . showGist)
   where findGistListForUser username = 
-          liftM decodeGistList $ simpleHttp ("https://api.github.com/users/" ++ username ++ "/gists")
+          liftM decodeGistList $ simpleHttp (gitHubUrl ["users",  username , "gists"])
 
 deleteGist :: BS.ByteString -> BS.ByteString -> String -> IO ()
-deleteGist user pass gistId = authRequest "DELETE" user pass ("https://api.github.com/gists/" ++ gistId)
+deleteGist user pass gistId = authRequest "DELETE" user pass (gitHubUrl [gistId])
 
 authRequest :: Method -> BS.ByteString -> BS.ByteString -> String -> IO ()
 authRequest httpMethod user password url = do
-    request <- parseUrl url
+    request <- parseUrl url 
     let request' = applyBasicAuth user password $ request { method = httpMethod }
     withManager $ \manager -> do
         response <- http request' manager
         return ()
 
+gitHubUrl :: [String] -> String
+gitHubUrl = intercalate "/" . (["https://api.github.com"] ++)
 
 encodeGist :: String -> [(String, BL.ByteString)] -> BL.ByteString
 encodeGist description files = encode $ object ["description" .= description, 

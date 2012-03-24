@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 import Test.HUnit
-import HGist (Gist(..), File(..), decodeGistList, showGist, encodeGist)
+import HGist (Gist(..), File(..), decodeGistList, showGist, encodeGist, gitHubUrl)
 import qualified Data.ByteString.Lazy.Char8 as BL 
 
 tests = test [
@@ -29,7 +29,10 @@ tests = test [
     "(encodeGist)" ~:
     "{\"files\":{\"first-file\":{\"content\":\"first content\"}},\"description\":\"my description\",\"public\":true}" 
     ~=?
-    (BL.unpack $ encodeGist "my description" [("first-file", "first content")])
+    (BL.unpack $ encodeGist "my description" [("first-file", "first content")]),
+    
+    "(url)" ~:
+    "https://api.github.com/foo/bar" ~=? gitHubUrl ["foo", "bar"]
     ]
-        
+
 main = runTestTT tests
