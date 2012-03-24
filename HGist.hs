@@ -3,7 +3,7 @@ module HGist where
 
 import System.Environment (getArgs) 
 import Control.Applicative ((<$>), (<*>), empty)
-import Control.Monad (liftM)
+import Control.Monad (liftM, void)
 import Data.Aeson
 import Data.Maybe (fromMaybe)
 import Data.List (intercalate)
@@ -49,15 +49,14 @@ listGists user = findGistListForUser user >>= mapM_ (putStrLn . showGist)
           liftM decodeGistList $ simpleHttp (gitHubUrl ["users",  username , "gists"])
 
 deleteGist :: BS.ByteString -> BS.ByteString -> String -> IO ()
-deleteGist user pass gistId = authRequest "DELETE" user pass (gitHubUrl [gistId])
+deleteGist user pass gistId = do
+  request <- parseUrl $ gitHubUrl [gistId]
+  authRequest user pass request {method = "DELETE"}
+  return ()
 
-authRequest :: Method -> BS.ByteString -> BS.ByteString -> String -> IO ()
-authRequest httpMethod user password url = do
-    request <- parseUrl url 
-    let request' = applyBasicAuth user password $ request { method = httpMethod }
-    withManager $ \manager -> do
-        response <- http request' manager
-        return ()
+authRequest ::  BS.ByteString -> BS.ByteString -> Request IO -> IO ()
+authRequest user password request =
+    withManager $ void . http (applyBasicAuth user password request)
 
 gitHubUrl :: [String] -> String
 gitHubUrl = intercalate "/" . (["https://api.github.com"] ++)
