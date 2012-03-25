@@ -2,7 +2,8 @@
 
 (defun test-command ()
   (interactive)
-  (compile "runhaskell HGistTest.hs"))
+  (compile "runhaskell -W HGistTest.hs && ghc -W -o hgist Main.hs")
+)
 
 (setq project-directory-substrings
       '("hgist"))

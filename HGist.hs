@@ -1,14 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module HGist where
 
-import System.Environment (getArgs) 
 import Control.Applicative ((<$>), (<*>), empty)
 import Control.Monad (liftM, void)
 import Data.Aeson
 import Data.Maybe (fromMaybe)
 import Data.List (intercalate)
 import Network.HTTP.Conduit
-import Network.HTTP.Types (Method)
 import qualified Data.HashMap.Strict as H
 import qualified Data.ByteString.Lazy.Char8 as BL 
 import qualified Data.ByteString.Char8 as BS
@@ -78,14 +76,3 @@ encodeGist description files =
   encode $ object ["description" .= description, 
                    "public" .= True,
                    "files" .= object [T.pack name .= object ["content" .= content] | (name, content) <- files]]
-
-dispatch :: [String] -> IO ()
-dispatch ("ls" : user: []) = listGists user
-dispatch ("rm" : user :  password : gistId : []) = deleteGist (BS.pack user) (BS.pack password) gistId
-dispatch ("create" : user : password : description : filenames) = createGist (BS.pack user) (BS.pack password) description filenames
-
-main :: IO ()
-main = do
-    args <- getArgs
-    dispatch args
-
