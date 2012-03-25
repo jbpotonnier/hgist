@@ -15,6 +15,6 @@ Then you can compile using :
 
 
 ## Usage
-- `hgist ls <user>` : list gist for user `user`
-- `hgist rm <user> <password> <gistId>` : delete gist having `gistId` as id
-- `hgist create <user> <password> <description> <file>...` : create a gist containing the files listed and havinf `description` as description. 
+- `hgist ls <user>` : list gists for user `user`.
+- `hgist rm <user> <password> <gistId>` : delete gist having `gistId` as id.
+- `hgist create <user> <password> <description> <file>...` : create a gist containing the files listed and having `description` as description. 
