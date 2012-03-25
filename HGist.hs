@@ -50,9 +50,21 @@ listGists user = findGistListForUser user >>= mapM_ (putStrLn . showGist)
 
 deleteGist :: BS.ByteString -> BS.ByteString -> String -> IO ()
 deleteGist user pass gistId = do
-  request <- parseUrl $ gitHubUrl [gistId]
+  request <- parseUrl $ gitHubUrl ["gists", gistId]
   authRequest user pass request {method = "DELETE"}
   return ()
+
+createGist :: BS.ByteString -> BS.ByteString -> String -> [String] -> IO ()
+createGist user pass description filenames = do
+  request <- parseUrl $ gitHubUrl ["gists"]
+  files <- mapM loadFile filenames
+  let body = encodeGist description files
+  authRequest user pass request {method = "POST", requestBody = RequestBodyLBS body}
+  return ()
+  where 
+    loadFile name = do 
+      content <- BL.readFile name
+      return (name, content)
 
 authRequest ::  BS.ByteString -> BS.ByteString -> Request IO -> IO ()
 authRequest user password request =
@@ -68,8 +80,9 @@ encodeGist description files =
                    "files" .= object [T.pack name .= object ["content" .= content] | (name, content) <- files]]
 
 dispatch :: [String] -> IO ()
-dispatch ["ls", user] = listGists user
-dispatch ["rm", user, password, gistId] = deleteGist (BS.pack user) (BS.pack password) gistId
+dispatch ("ls" : user: []) = listGists user
+dispatch ("rm" : user :  password : gistId : []) = deleteGist (BS.pack user) (BS.pack password) gistId
+dispatch ("create" : user : password : description : filenames) = createGist (BS.pack user) (BS.pack password) description filenames
 
 main :: IO ()
 main = do
