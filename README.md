@@ -5,12 +5,14 @@ This software enables to create, delete and list your gists using command line.
 ## Installation
 You will need `http-conduit` and `aeson` to build this program :
 
-> cabal install http-conduit
-> cabal install aeson
+    cabal install http-conduit
+    cabal install aeson
+
 
 Then you can compile using :
 
-> ghc -o hgist Main.hs  
+    ghc -o hgist Main.hs  
+
 
 ## Usage
 - `hgist ls <user>` : list gist for user `user`
